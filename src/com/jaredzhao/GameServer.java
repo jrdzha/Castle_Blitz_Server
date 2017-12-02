@@ -25,7 +25,7 @@ public class GameServer{
                     while (true) {
                         Client client = new Client(serverSocket.accept());
                         clients.put(client);
-                        System.out.println(client.getAddressAndPort() + " has connected");
+                        System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " CONN");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -48,15 +48,15 @@ public class GameServer{
                                 String input = new BufferedReader(new InputStreamReader(client.socket.getInputStream())).readLine();
                                 if (input.equals("ping")) {
                                     client.lastPing = (int) (System.currentTimeMillis() / 1000);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " ping " + client.lastPing);
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + client.lastPing);
                                 } else {
                                     client.inputQueue.put(input);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " " + input);
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " IN   " + input);
                                 }
                             }
                             clients.put(client);
                         }
-                        Thread.sleep(100);
+                        Thread.sleep(1);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -77,12 +77,14 @@ public class GameServer{
                         for(Client client = clients.poll(); client != null; client = clients.poll()) {
                             DataOutputStream output = new DataOutputStream(client.socket.getOutputStream());
                             while (client.outputQueue.size() != 0) {
-                                output.writeBytes(client.outputQueue.poll() + "\n");
+                                String next_output = client.outputQueue.poll();
+                                System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " OUT  " + next_output);
+                                output.writeBytes(next_output + "\n");
                                 output.flush();
                             }
                             clients.put(client);
                         }
-                        Thread.sleep(100);
+                        Thread.sleep(1);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -107,7 +109,7 @@ public class GameServer{
                                 clients.put(client);
                             }
                         }
-                        Thread.sleep(100);
+                        Thread.sleep(1);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -115,6 +117,26 @@ public class GameServer{
             }
         };
         deadCollectionCleanUpThread.start();
+        return true;
+    }
+
+    public boolean startClientHandleThread(){
+        Thread clientHandleThread = new Thread("Client Handle Thread") {
+            public void run() {
+                try {
+                    while(true) {
+                        for(Client client = clients.poll(); client != null; client = clients.poll()) {
+                            client.update();
+                            clients.put(client);
+                        }
+                        Thread.sleep(1);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        clientHandleThread.start();
         return true;
     }
 }

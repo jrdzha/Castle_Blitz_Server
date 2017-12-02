@@ -3,6 +3,8 @@ package com.jaredzhao;
 import java.io.*;
 
 public class Main {
+    public static String version = "Build 1";
+
     public static void main(String[] args) throws IOException {
 
         if (args.length != 1) {
@@ -18,6 +20,7 @@ public class Main {
         gameServer.startReceivingThread();
         gameServer.startSendingThread();
         gameServer.startDeadConnectionCleanUpThread();
+        gameServer.startClientHandleThread();
 
         System.out.println("Castle Blitz Server started on port " + port);
     }

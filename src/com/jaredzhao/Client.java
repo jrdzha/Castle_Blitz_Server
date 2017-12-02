@@ -22,4 +22,17 @@ public class Client {
         return socket.getRemoteSocketAddress() + ":" + socket.getLocalPort();
     }
 
+    public void update(){
+        if(inputQueue.size() != 0){
+            String[] input = inputQueue.poll().split("\\.");
+            if(input[0].equals("login")){
+                if(input[1].equals("JRDZHA") && input[2].equals("Imjahrudz3!")){
+                    outputQueue.add("login.successful");
+                }
+            } else if(input[0].equals("register")){
+                outputQueue.add("register.successful");
+            }
+        }
+    }
+
 }

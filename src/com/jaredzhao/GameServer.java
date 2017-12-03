@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -48,7 +49,7 @@ public class GameServer{
                                 String input = new BufferedReader(new InputStreamReader(client.socket.getInputStream())).readLine();
                                 if (input.equals("ping")) {
                                     client.lastPing = (int) (System.currentTimeMillis() / 1000);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + client.lastPing);
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + new Date(client.lastPing).toString());
                                 } else {
                                     client.inputQueue.put(input);
                                     System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " IN   " + input);

@@ -1,6 +1,7 @@
 package com.jaredzhao;
 
 import java.io.*;
+import java.util.Date;
 
 public class Main {
     public static String version = "Build 1";
@@ -22,6 +23,6 @@ public class Main {
         gameServer.startDeadConnectionCleanUpThread();
         gameServer.startClientHandleThread();
 
-        System.out.println("Castle Blitz Server started on port " + port);
+        System.out.println("Castle Blitz Server started on port [" + port + "] at " + new Date());
     }
 }

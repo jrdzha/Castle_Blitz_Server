@@ -47,9 +47,9 @@ public class GameServer{
                         for(Client client = clients.poll(); client != null; client = clients.poll()) {
                             if (client.socket.getInputStream().available() > 0) {
                                 String input = new BufferedReader(new InputStreamReader(client.socket.getInputStream())).readLine();
-                                if (input.equals("ping")) {
+                                if (input.equals("PING")) {
                                     client.lastPing = (int) (System.currentTimeMillis() / 1000);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + new Date(client.lastPing).toString());
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + new Date());
                                 } else {
                                     client.inputQueue.put(input);
                                     System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " IN   " + input);

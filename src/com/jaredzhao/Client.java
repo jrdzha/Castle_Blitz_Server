@@ -84,6 +84,7 @@ public class Client {
                         for (Document character : unlockedCharactersList) {
                             unlockedCharacters = unlockedCharacters + "." + character.getString("character");
                         }
+                        outputQueue.add("id." + uniqueID);
                         outputQueue.add("rank." + document.getInteger("rank"));
                         outputQueue.add("level." + document.getInteger("level"));
                         outputQueue.add("xp." + document.getInteger("xp"));

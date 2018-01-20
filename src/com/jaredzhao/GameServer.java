@@ -26,7 +26,7 @@ public class GameServer{
                     while (true) {
                         Client client = new Client(serverSocket.accept());
                         clients.put(client);
-                        System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " CONN");
+                        System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " - CONN - ");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -49,10 +49,15 @@ public class GameServer{
                                 String input = new BufferedReader(new InputStreamReader(client.socket.getInputStream())).readLine();
                                 if (input.equals("PING")) {
                                     client.lastPing = (int) (System.currentTimeMillis() / 1000);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " PING " + new Date());
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " - IN   - PING " + new Date());
+                                    if(client.loggedIn()){
+                                        client.outputQueue.add("PING.OK");
+                                    } else {
+                                        client.outputQueue.add("PING.ANON");
+                                    }
                                 } else {
                                     client.inputQueue.put(input);
-                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " IN   " + input);
+                                    System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " - IN   - " + input);
                                 }
                             }
                             clients.put(client);
@@ -79,7 +84,7 @@ public class GameServer{
                             DataOutputStream output = new DataOutputStream(client.socket.getOutputStream());
                             while (client.outputQueue.size() != 0) {
                                 String next_output = client.outputQueue.poll();
-                                System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " OUT  " + next_output);
+                                System.out.println("[" + client.uniqueID + "] " + client.getAddressAndPort() + " - OUT  - " + next_output);
                                 output.writeBytes(next_output + "\n");
                                 output.flush();
                             }

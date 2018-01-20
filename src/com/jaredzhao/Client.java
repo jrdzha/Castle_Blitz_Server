@@ -32,24 +32,28 @@ public class Client {
         return String.valueOf(socket.getRemoteSocketAddress());
     }
 
+    public boolean loggedIn(){
+        return !uniqueID.equals("--------");
+    }
+
     public void update(){
         if(inputQueue.size() != 0){
             String[] input = inputQueue.poll().split("\\.");
-            if(input[0].equals("login")){
+            if(input[0].equals("LOGIN")){
                 Iterator iterator = MongoDBAccessor.queryDocument(new BasicDBObject("username", input[1]));
                 if(iterator.hasNext()){
                     Document document = (Document)iterator.next();
                     if(input[2].equals(document.getString("password"))){
                         uniqueID = document.getString("id");
                         MongoDBAccessor.collection.updateOne(Filters.eq("id", uniqueID), Updates.push("login-history", new BasicDBObject("time-stamp", new Date().toString())));
-                        outputQueue.add("login.successful");
+                        outputQueue.add("LOGIN.OK");
                     } else {
-                        outputQueue.add("login.fail");
+                        outputQueue.add("LOGIN.FAIL");
                     }
                 } else {
-                    outputQueue.add("login.fail");
+                    outputQueue.add("LOGIN.FAIL");
                 }
-            } else if(input[0].equals("register")){
+            } else if(input[0].equals("REGISTER")){
                 Iterator iterator = MongoDBAccessor.queryDocument(new BasicDBObject("username", input[1]));
                 if(!iterator.hasNext()) {
                     uniqueID = UniqueIDSupplier.getNextID();
@@ -70,27 +74,27 @@ public class Client {
                                     .append("gold", 0)
                                     .append("shards", 0)
                                     .append("unlocked-characters", unlockedCharacters));
-                    outputQueue.add("register.successful");
+                    outputQueue.add("REGISTER.OK");
                 } else {
-                    outputQueue.add("username.exists");
+                    outputQueue.add("USERNAME.EXISTS");
                 }
-            } else if(input[0].equals("request") && !uniqueID.equals("--------")){
+            } else if(input[0].equals("REQUEST") && loggedIn()){
                 Iterator iterator = MongoDBAccessor.queryDocument(new BasicDBObject("id", uniqueID));
                 if(iterator.hasNext()) {
                     Document document = (Document) iterator.next();
-                    if(input[1].equals("stats")) {
+                    if(input[1].equals("STATS")) {
                         String unlockedCharacters = "";
                         List<Document> unlockedCharactersList = (List<Document>) document.get("unlocked-characters");
                         for (Document character : unlockedCharactersList) {
                             unlockedCharacters = unlockedCharacters + "." + character.getString("character");
                         }
-                        outputQueue.add("id." + uniqueID);
-                        outputQueue.add("rank." + document.getInteger("rank"));
-                        outputQueue.add("level." + document.getInteger("level"));
-                        outputQueue.add("xp." + document.getInteger("xp"));
-                        outputQueue.add("gold." + document.getInteger("gold"));
-                        outputQueue.add("shards." + document.getInteger("shards"));
-                        outputQueue.add("unlocked-characters" + unlockedCharacters); //unlockedCharacters already has a leading "."
+                        outputQueue.add("ID." + uniqueID);
+                        outputQueue.add("RANK." + document.getInteger("rank"));
+                        outputQueue.add("LEVEL." + document.getInteger("level"));
+                        outputQueue.add("XP." + document.getInteger("xp"));
+                        outputQueue.add("GOLD." + document.getInteger("gold"));
+                        outputQueue.add("SHARDS." + document.getInteger("shards"));
+                        outputQueue.add("UNLOCKED-CHARACTERS" + unlockedCharacters); //unlockedCharacters already has a leading "."
                     }
                 }
             }

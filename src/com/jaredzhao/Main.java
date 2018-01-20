@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Date;
 
 public class Main {
-    public static String version = "Build 4";
+    public static String version = "Build 5";
 
     public static void main(String[] args) throws IOException {
 
